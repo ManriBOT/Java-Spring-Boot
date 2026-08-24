@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller CRUD - Clientes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        h2 {
+            color: #333;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="email"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        #mensaje {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Agregar Cliente</h2>
+<form id="clienteForm">
+    <div class="form-group">
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" required>
+    </div>
+    <div class="form-group">
+        <label for="email">Correo Electrónico:</label>
+        <input type="email" id="email" required>
+    </div>
+    <button type="submit">Guardar</button>
+</form>
+<div id="mensaje"></div>
+
+<h2>Lista de Clientes</h2>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Email</th>
+    </tr>
+    </thead>
+    <tbody id="tablaClientes">
+    <!-- Los datos se cargan dinámicamente -->
+    </tbody>
+</table>
+
+<script>
+    // Cargar los usuarios registrados al abrir la página
+    document.addEventListener("DOMContentLoaded", cargarUsuarios);
+
+    // Evento al enviar el formulario
+    document.getElementById('clienteForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+
+        // Formato de parámetros URL-Encoded para coincidir con @RequestParam
+        const formData = new URLSearchParams();
+        formData.append('name', name);
+        formData.append('email', email);
+
+        fetch('http://localhost:8081/demo/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor (Status 500)');
+            }
+            return response.text();
+        })
+        .then(data => {
+            document.getElementById('mensaje').style.color = 'green';
+            document.getElementById('mensaje').innerText = 'Cliente guardado correctamente';
+            document.getElementById('clienteForm').reset();
+            cargarUsuarios(); // Actualizar la lista automáticamente
+        })
+        .catch(error => {
+            console.error('Error al guardar:', error);
+            document.getElementById('mensaje').style.color = 'red';
+            document.getElementById('mensaje').innerText = 'Error al guardar el cliente';
+        });
+    });
+
+    // Función para consultar todos los usuarios
+    function cargarUsuarios() {
+        fetch('http://localhost:8081/demo/all')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al consultar usuarios');
+            }
+            return response.json();
+        })
+        .then(users => {
+            const tbody = document.getElementById('tablaClientes');
+            tbody.innerHTML = '';
+
+            if (Array.isArray(users)) {
+                users.forEach(user => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error cargando usuarios:', error);
+        });
+    }
+</script>
+</body>
+</html>
