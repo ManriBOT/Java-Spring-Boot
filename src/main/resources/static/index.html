@@ -3,114 +3,503 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taller CRUD - Clientes</title>
+    <title>CRUD - PROYECTO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --surface-color: #ffffff;
+            --header-bg: #0f172a;
+            --sidebar-bg: #1e293b;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --text-main: #334155;
+            --text-heading: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --radius: 10px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 30px auto;
-            padding: 20px;
-            background-color: #f4f4f9;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        h2 {
-            color: #333;
+
+        /* Top Header */
+        header {
+            background-color: var(--header-bg);
+            color: white;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
         }
-        form {
-            background: #fff;
-            padding: 20px;
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .brand-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #f8fafc;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-icon {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: #cbd5e1;
+            padding: 8px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        /* Layout Principal */
+        .app-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            color: #94a3b8;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        aside.collapsed {
+            width: 0;
+            overflow: hidden;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 16px 12px;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active a, .nav-item a:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Área de Contenido */
+        main {
+            flex: 1;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .dashboard-header {
+            margin-bottom: 24px;
+        }
+
+        .dashboard-header h2 {
+            font-size: 1.5rem;
+            color: var(--text-heading);
+            font-weight: 700;
+        }
+
+        .dashboard-header p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-heading);
             margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
+
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            font-size: 0.825rem;
+            font-weight: 600;
+            color: var(--text-heading);
+            margin-bottom: 6px;
         }
-        input[type="text"], input[type="email"] {
+
+        input {
             width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.2s ease;
         }
-        button {
-            background-color: #28a745;
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .btn-primary {
+            width: 100%;
+            background-color: var(--primary);
             color: white;
-            padding: 10px 15px;
+            padding: 11px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: background 0.2s ease;
         }
-        button:hover {
-            background-color: #218838;
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
         }
+
+        /* Tabla */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            background: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
             text-align: left;
         }
+
         th {
-            background-color: #007bff;
+            background-color: #f8fafc;
+            padding: 12px 16px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 14px 16px;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge-id {
+            background-color: #e2e8f0;
+            color: #334155;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--text-muted);
+        }
+
+        /* Toast Notificaciones Exitosas */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 20px;
+            border-radius: 8px;
             color: white;
+            font-size: 0.875rem;
+            font-weight: 500;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+            background-color: var(--success);
         }
-        #mensaje {
-            margin-top: 10px;
-            font-weight: bold;
+
+        /* Modal Alerta de Error */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
         }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px auto;
+        }
+
+        .modal-icon.error-404 { background-color: #fef3c7; color: var(--warning); }
+        .modal-icon.error-500 { background-color: #fee2e2; color: var(--danger); }
+
+        .modal-title { font-size: 1.2rem; font-weight: 700; color: var(--text-heading); margin-bottom: 8px; }
+        .modal-message { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; }
+
+        .modal-details {
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            color: #475569;
+            font-family: monospace;
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
+
+        .btn-modal-close {
+            background-color: var(--header-bg);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-modal-close:hover { background-color: var(--sidebar-bg); }
     </style>
 </head>
 <body>
 
-<h2>Agregar Cliente</h2>
-<form id="clienteForm">
-    <div class="form-group">
-        <label for="name">Nombre:</label>
-        <input type="text" id="name" required>
+<!-- Header Superior -->
+<header>
+    <div class="header-left">
+        <button class="menu-toggle" id="toggleSidebar" title="Alternar Menú">
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+        <span class="brand-title">CRUD - PROYECTO</span>
     </div>
-    <div class="form-group">
-        <label for="email">Correo Electrónico:</label>
-        <input type="email" id="email" required>
+    <div class="header-actions">
+        <button class="btn-icon" title="Notificaciones">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+        </button>
+        <button class="btn-icon" title="Configuración">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+        </button>
     </div>
-    <button type="submit">Guardar</button>
-</form>
-<div id="mensaje"></div>
+</header>
 
-<h2>Lista de Clientes</h2>
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Email</th>
-    </tr>
-    </thead>
-    <tbody id="tablaClientes">
-    <!-- Los datos se cargan dinámicamente -->
-    </tbody>
-</table>
+<div class="app-container">
+    <!-- Menú Desplegable Lateral -->
+    <aside id="sidebar">
+        <ul class="nav-list">
+            <li class="nav-item active">
+                <a href="http://localhost:8081/index.html">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    Gestión de Clientes
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Área de Trabajo -->
+    <main>
+        <div class="dashboard-header">
+            <h2>Panel de Clientes</h2>
+            <p>Registra y administra las cuentas activas dentro del sistema</p>
+        </div>
+
+        <div class="grid-layout">
+            <!-- Formulario -->
+            <div class="card">
+                <h3 class="card-title">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                    Nuevo Registro
+                </h3>
+                <form id="clienteForm">
+                    <div class="form-group">
+                        <label for="name">Nombre Completo</label>
+                        <input type="text" id="name" placeholder="Ej. Carlos Mendoza" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico</label>
+                        <input type="email" id="email" placeholder="correo@ejemplo.com" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Guardar Cliente</button>
+                </form>
+            </div>
+
+            <!-- Tabla de Datos -->
+            <div class="card">
+                <h3 class="card-title">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    Directorio General
+                </h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tablaClientes">
+                        <!-- Datos insertados dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Toast Exitoso -->
+<div id="toast" class="toast"></div>
+
+<!-- Modal Flotante de Alerta de Error -->
+<div id="errorModal" class="modal-overlay">
+    <div class="modal-card">
+        <div id="modalIcon" class="modal-icon error-500">
+            <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <h3 id="modalTitle" class="modal-title">Error en el Sistema</h3>
+        <p id="modalMessage" class="modal-message">Ha ocurrido un problema al procesar la solicitud.</p>
+        <div id="modalDetails" class="modal-details">Estado: 500</div>
+        <button class="btn-modal-close" onclick="cerrarModalError()">Entendido</button>
+    </div>
+</div>
 
 <script>
-    // Cargar los usuarios registrados al abrir la página
+    // Alternar visibilidad de la barra lateral
+    document.getElementById('toggleSidebar').addEventListener('click', function() {
+        document.getElementById('sidebar').classList.toggle('collapsed');
+    });
+
     document.addEventListener("DOMContentLoaded", cargarUsuarios);
 
-    // Evento al enviar el formulario
+    // Envío del formulario
     document.getElementById('clienteForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
         const name = document.getElementById('name').value;
         const email = document.getElementById('email').value;
 
-        // Formato de parámetros URL-Encoded para coincidir con @RequestParam
         const formData = new URLSearchParams();
         formData.append('name', name);
         formData.append('email', email);
@@ -122,31 +511,30 @@
             },
             body: formData
         })
-        .then(response => {
+        .then(async response => {
             if (!response.ok) {
-                throw new Error('Error en la respuesta del servidor (Status 500)');
+                const errorData = await response.json();
+                throw errorData;
             }
             return response.text();
         })
-        .then(data => {
-            document.getElementById('mensaje').style.color = 'green';
-            document.getElementById('mensaje').innerText = 'Cliente guardado correctamente';
+        .then(() => {
+            mostrarToast('Cliente guardado exitosamente');
             document.getElementById('clienteForm').reset();
-            cargarUsuarios(); // Actualizar la lista automáticamente
+            cargarUsuarios();
         })
-        .catch(error => {
-            console.error('Error al guardar:', error);
-            document.getElementById('mensaje').style.color = 'red';
-            document.getElementById('mensaje').innerText = 'Error al guardar el cliente';
+        .catch(err => {
+            mostrarAlertaError(err);
         });
     });
 
-    // Función para consultar todos los usuarios
+    // Carga de la lista de usuarios
     function cargarUsuarios() {
         fetch('http://localhost:8081/demo/all')
-        .then(response => {
+        .then(async response => {
             if (!response.ok) {
-                throw new Error('Error al consultar usuarios');
+                const errorData = await response.json();
+                throw errorData;
             }
             return response.json();
         })
@@ -154,21 +542,63 @@
             const tbody = document.getElementById('tablaClientes');
             tbody.innerHTML = '';
 
-            if (Array.isArray(users)) {
+            if (Array.isArray(users) && users.length > 0) {
                 users.forEach(user => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${user.id}</td>
-                        <td>${user.name}</td>
-                        <td>${user.email}</td>
+                        <td><span class="badge-id">#${user.id}</span></td>
+                        <td style="font-weight: 600; color: var(--text-heading);">${user.name}</td>
+                        <td style="color: var(--text-muted);">${user.email}</td>
                     `;
                     tbody.appendChild(tr);
                 });
+            } else {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="empty-state">No hay registros almacenados.</td>
+                    </tr>
+                `;
             }
         })
-        .catch(error => {
-            console.error('Error cargando usuarios:', error);
+        .catch(err => {
+            mostrarAlertaError(err);
         });
+    }
+
+    // Funciones para manejar la alerta modal de error y notificaciones
+    function mostrarAlertaError(errJson) {
+        const modal = document.getElementById('errorModal');
+        const icon = document.getElementById('modalIcon');
+        const title = document.getElementById('modalTitle');
+        const message = document.getElementById('modalMessage');
+        const details = document.getElementById('modalDetails');
+
+        // Mapea la información recibida desde el GlobalExceptionHandler
+        title.innerText = errJson.title || errJson.error || 'Error en la solicitud';
+        message.innerText = errJson.message || 'No se pudo completar la operación.';
+        details.innerText = `Estado: ${errJson.status || 500} | ${errJson.timestamp || new Date().toISOString()}`;
+
+        if (errJson.status === 404) {
+            icon.className = 'modal-icon error-404';
+        } else {
+            icon.className = 'modal-icon error-500';
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function cerrarModalError() {
+        document.getElementById('errorModal').style.display = 'none';
+    }
+
+    function mostrarToast(mensaje) {
+        const toast = document.getElementById('toast');
+        toast.innerText = mensaje;
+        toast.style.display = 'block';
+
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
     }
 </script>
 </body>
